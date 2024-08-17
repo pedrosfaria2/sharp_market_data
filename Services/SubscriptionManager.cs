@@ -2,7 +2,6 @@
 using System.Text;
 using BinanceWebSocket.Util;
 
-
 namespace BinanceWebSocket.Services
 {
     public class SubscriptionManager(ClientWebSocket client)
@@ -32,6 +31,30 @@ namespace BinanceWebSocket.Services
             {
                 Console.WriteLine($"No symbols found for pair '{pair}'.");
             }
+        }
+
+        public async Task SubscribeToSymbol(string symbol)
+        {
+            symbol = symbol.ToLower();
+
+            if (_subscriptions.Contains(symbol))
+            {
+                Console.WriteLine($"Already subscribed to {symbol}");
+                return;
+            }
+
+            var subscribeMessage = new
+            {
+                method = "SUBSCRIBE",
+                @params = new[] { $"{symbol}@trade" },
+                id = 1
+            };
+
+            var message = Encoding.UTF8.GetBytes(JsonHelper.Serialize(subscribeMessage));
+            await client.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Text, true, CancellationToken.None);
+            Console.WriteLine($"Subscribed to {symbol}@trade");
+
+            _subscriptions.Add(symbol);
         }
 
         public async Task Unsubscribe(string symbol)

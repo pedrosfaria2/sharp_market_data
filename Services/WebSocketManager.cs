@@ -86,6 +86,11 @@ namespace BinanceWebSocket.Services
             await _subscriptionManager.SubscribeToPair(pair, validSymbols);
         }
 
+        public async Task SubscribeToSymbol(string symbol)
+        {
+            await _subscriptionManager.SubscribeToSymbol(symbol); 
+        }
+
         public async Task Unsubscribe(string symbol)
         {
             await _subscriptionManager.Unsubscribe(symbol);

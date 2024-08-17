@@ -16,8 +16,8 @@ namespace BinanceWebSocket.Services
 
                     if (data?["e"]?.ToString() == "trade")
                     {
-                        //Console.WriteLine($"Processing trade event for symbol: {data?["s"]?.ToString()}");
-
+                        //Console.WriteLine($"Processing trade event for symbol: {data?["s"]}");
+                        
                         var marketData = new MarketData
                         {
                             EventType = data?["e"]?.ToString() ?? string.Empty,
@@ -29,7 +29,7 @@ namespace BinanceWebSocket.Services
                             TradeTime = long.Parse(data?["T"]?.ToString() ?? "0"),
                             IsBuyerMarketMaker = bool.Parse(data?["m"]?.ToString() ?? "false")
                         };
-
+                        
                         await databaseWorker.InsertDataAsync(marketData);
                     }
                     else

@@ -14,4 +14,10 @@
     <PackageReference Include="System.Threading.Channels" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Services\MarketDataWorker.cs" />
+    <Compile Remove="Services\MarketDataDisplay.cs" />
+    <Compile Remove="Util\MarketDataStatsDisplay.cs" />
+  </ItemGroup>
+
 </Project>

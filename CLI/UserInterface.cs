@@ -5,14 +5,8 @@ namespace BinanceWebSocket.CLI
 {
     public class UserInterface
     {
-        private readonly WebSocketManager _wsManager;
-        private readonly BinanceApiService _apiService;
-
-        public UserInterface()
-        {
-            _wsManager = new WebSocketManager();
-            _apiService = new BinanceApiService();
-        }
+        private readonly WebSocketManager _wsManager = new();
+        private readonly BinanceApiService _apiService = new();
 
         public async Task Start()
         {
@@ -39,7 +33,7 @@ namespace BinanceWebSocket.CLI
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
                         .Title("[yellow]What would you like to do?[/]")
-                        .PageSize(7)
+                        .PageSize(8)
                         .HighlightStyle(new Style(Color.Gold1))
                         .MoreChoicesText("[grey](Move up and down to select an option)[/]")
                         .AddChoices(new[]
@@ -49,7 +43,8 @@ namespace BinanceWebSocket.CLI
                             "3. [bold aqua]Subscribe[/] to Symbols by Pair",
                             "4. [bold aqua]Unsubscribe[/] from Symbol",
                             "5. [bold aqua]Fetch[/] Symbols",
-                            "6. [bold red]Exit[/]"
+                            "6. [bold aqua]Subscribe[/] to a Single Symbol",
+                            "7. [bold red]Exit[/]"
                         }));
 
                 switch (choice)
@@ -72,8 +67,7 @@ namespace BinanceWebSocket.CLI
                         break;
                     case "5. [bold aqua]Fetch[/] Symbols":
                         validSymbols = await _apiService.FetchSymbols();
-
-                        // Define a quantidade de colunas desejada
+                        
                         int columns = 5;
 
                         var grid = new Grid();
@@ -81,28 +75,32 @@ namespace BinanceWebSocket.CLI
                         {
                             grid.AddColumn();
                         }
-
-                        // Adiciona os símbolos em várias colunas
+                        
                         for (int i = 0; i < validSymbols.Count; i += columns)
                         {
                             var row = new List<string>();
                             for (int j = 0; j < columns; j++)
                             {
-                                if (i + j < validSymbols.Count)
-                                {
-                                    row.Add($"[aqua]{validSymbols[i + j]}[/]");
-                                }
-                                else
-                                {
-                                    row.Add(""); // Adiciona uma célula vazia para completar a linha
-                                }
+                                row.Add(i + j < validSymbols.Count ? $"[aqua]{validSymbols[i + j]}[/]" : "");
                             }
                             grid.AddRow(row.ToArray());
                         }
 
                         AnsiConsole.Write(grid);
                         break;
-                    case "6. [bold red]Exit[/]":
+                    case "6. [bold aqua]Subscribe[/] to a Single Symbol":
+                        validSymbols = await _apiService.FetchSymbols();
+
+                        var selectedSymbol = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                                .Title("[yellow]Select a symbol to subscribe to:[/]")
+                                .PageSize(10)
+                                .HighlightStyle(new Style(Color.Aqua))
+                                .AddChoices(validSymbols));
+
+                        await _wsManager.SubscribeToSymbol(selectedSymbol);
+                        break;
+                    case "7. [bold red]Exit[/]":
                         AnsiConsole.MarkupLine("[green]Exiting...[/]");
                         return;
                 }

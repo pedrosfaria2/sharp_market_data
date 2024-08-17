@@ -11,5 +11,5 @@ namespace BinanceWebSocket.Services
             await Task.Run(() => dbManager.InsertData(marketData));
             //Console.WriteLine($"Data inserted for {marketData.Symbol}");
         }
-    }
+    }   
 }
